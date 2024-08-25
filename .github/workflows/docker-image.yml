@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run:  |
-          docker login --username FlemmingKrarup --password ${{ secrets.GH.PAT}} ghcr.io
+          docker login --username FlemmingKrarup --password ${{ secrets.GH_PAT}} ghcr.io
           docker build . --tag ghcr.io/flemmingkrarup/cups:latest
           docker push ghcr.io/flemmingkrarup/cups:latest
 
