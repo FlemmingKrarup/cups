@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/Copenhagen"
 ENV CUPSADMIN=admin
 ENV CUPSPASSWORD=password
-
+ENV CUPS_VERSION=2.4.16
 
 LABEL org.opencontainers.image.description="CUPS Printer Server"
 
@@ -15,34 +15,60 @@ LABEL org.opencontainers.image.description="CUPS Printer Server"
 
 RUN apt-get update -qq && apt-get upgrade -qqy \
     && apt-get install -qqy \
-        apt-utils \
-        usbutils \
-        cups \
-        cups-filters \
-        printer-driver-all \
-        printer-driver-cups-pdf \
-        printer-driver-foo2zjs \
-        foomatic-db-compressed-ppds \
-        openprinting-ppds \
-        hpijs-ppds \
-        hp-ppd \
-        hplip \
-        avahi-daemon \
-        gnupg \
-        wget \
-        ca-certificates \
-        inotify-tools \
-        python3-cups \
-        rsync \
+    apt-utils \
+    usbutils \
+  #  cups \
+  #  cups-filters \
+    printer-driver-all \
+    printer-driver-cups-pdf \
+    printer-driver-foo2zjs \
+    foomatic-db-compressed-ppds \
+    openprinting-ppds \
+    hpijs-ppds \
+    hp-ppd \
+    hplip \
+    avahi-daemon \
+    gnupg \
+    wget \
+    ca-certificates \
+    inotify-tools \
+    python3-cups \
+    rsync \
+    build-essential \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
+    libcups2-dev \
+    libavahi-client-dev \
+    libdbus-1-dev \
+    libssl-dev \
+    libjpeg-dev \
+    libpng-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Add SULDR repository using keyring package (robust method)
-RUN wget -q http://www.bchemnet.com/suldr/debian/extra/suldr-keyring_2_all.deb \
-    && dpkg -i suldr-keyring_2_all.deb \
-    && rm suldr-keyring_2_all.deb
 
-RUN echo "deb http://www.bchemnet.com/suldr/debian extra main" \
-    > /etc/apt/sources.list.d/suldr.list
+# Download and extract CUPS source
+RUN wget -q https://github.com/OpenPrinting/cups/releases/download/v${CUPS_VERSION}/cups-${CUPS_VERSION}-source.tar.gz \
+    && tar -xzf cups-${CUPS_VERSION}-source.tar.gz \
+    && rm cups-${CUPS_VERSION}-source.tar.gz
+
+# Build and install CUPS
+WORKDIR /cups-${CUPS_VERSION}
+RUN ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig
+
+# Clean up source directory
+WORKDIR /
+RUN rm -rf /cups-${CUPS_VERSION}
+
+RUN echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list
+RUN wget -q https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_4_all.deb \
+    && dpkg -i suldr-keyring_4_all.deb
+
 
 RUN apt-get update -qq \
     && apt-get install -qqy suld-driver2-1.00.39 \
