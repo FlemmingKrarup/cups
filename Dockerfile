@@ -1,10 +1,10 @@
 FROM debian:stable-slim
 
 # ENV variables
-ENV DEBIAN_FRONTEND = noninteractive
-ENV TZ = "Europe/Copenhagen"
-ENV CUPSADMIN = admin
-ENV CUPSPASSWORD = password
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ="Europe/Copenhagen"
+ENV CUPSADMIN=admin
+ENV CUPSPASSWORD=password
 
 
 LABEL org.opencontainers.image.description="CUPS Printer Server"
@@ -38,9 +38,9 @@ RUN apt-get update -qq && apt-get upgrade -qqy \
 
 # Add SULDR repository (modern method, no broken .deb)
 RUN wget -qO /usr/share/keyrings/suldr-archive-keyring.gpg \
-        https://www.bchemnet.com/suldr/suldr.gpg \
+        http://www.bchemnet.com/suldr/suldr.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/suldr-archive-keyring.gpg] \
-        https://www.bchemnet.com/suldr/debian extra main" \
+        http://www.bchemnet.com/suldr/debian extra main" \
         > /etc/apt/sources.list.d/suldr.list
 
 # Install Samsung Unified Linux Driver
