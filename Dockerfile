@@ -13,32 +13,42 @@ LABEL org.opencontainers.image.description="CUPS Printer Server"
 # Install dependencies
 
 
-RUN apt-get update -qq  && apt-get upgrade -qqy \
+RUN apt-get update -qq && apt-get upgrade -qqy \
     && apt-get install -qqy \
-    apt-utils \
-    usbutils \
-    cups \
-    cups-filters \
-    printer-driver-all \
-    printer-driver-cups-pdf \
-    printer-driver-foo2zjs \
-    foomatic-db-compressed-ppds \
-    openprinting-ppds \
-    hpijs-ppds \
-    hp-ppd \
-    hplip \
-    avahi-daemon \
-    gnupg \
-    inotify-tools \
-    python3-cups \
-    rsync \
+        apt-utils \
+        usbutils \
+        cups \
+        cups-filters \
+        printer-driver-all \
+        printer-driver-cups-pdf \
+        printer-driver-foo2zjs \
+        foomatic-db-compressed-ppds \
+        openprinting-ppds \
+        hpijs-ppds \
+        hp-ppd \
+        hplip \
+        avahi-daemon \
+        gnupg \
+        wget \
+        ca-certificates \
+        inotify-tools \
+        python3-cups \
+        rsync \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add SULDR repository (modern method, no broken .deb)
+RUN wget -qO /usr/share/keyrings/suldr-archive-keyring.gpg \
+        https://www.bchemnet.com/suldr/suldr.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/suldr-archive-keyring.gpg] \
+        https://www.bchemnet.com/suldr/debian extra main" \
+        > /etc/apt/sources.list.d/suldr.list
+
+# Install Samsung Unified Linux Driver
+RUN apt-get update -qq \
+    && apt-get install -qqy suld-driver2-1.00.39 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN bash -c 'echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list'
-RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb
-RUN dpkg -i suldr-keyring_2_all.deb
-RUN apt update -qq && apt install -qqy suld-driver2-1.00.39 && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 631
 EXPOSE 5353/udp
