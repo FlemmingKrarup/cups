@@ -36,19 +36,18 @@ RUN apt-get update -qq && apt-get upgrade -qqy \
         rsync \
     && rm -rf /var/lib/apt/lists/*
 
-# Add SULDR repository (modern method, no broken .deb)
-RUN wget -qO /usr/share/keyrings/suldr-archive-keyring.gpg \
-        http://www.bchemnet.com/suldr/suldr.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/suldr-archive-keyring.gpg] \
-        http://www.bchemnet.com/suldr/debian extra main" \
-        > /etc/apt/sources.list.d/suldr.list
+# Add SULDR repository using keyring package (robust method)
+RUN wget -q http://www.bchemnet.com/suldr/debian/extra/suldr-keyring_2_all.deb \
+    && dpkg -i suldr-keyring_2_all.deb \
+    && rm suldr-keyring_2_all.deb
 
-# Install Samsung Unified Linux Driver
+RUN echo "deb http://www.bchemnet.com/suldr/debian extra main" \
+    > /etc/apt/sources.list.d/suldr.list
+
 RUN apt-get update -qq \
     && apt-get install -qqy suld-driver2-1.00.39 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
 
 EXPOSE 631
 EXPOSE 5353/udp
