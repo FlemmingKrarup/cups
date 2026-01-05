@@ -1,10 +1,10 @@
 FROM debian:stable-slim
 
 # ENV variables
-ENV DEBIAN_FRONTEND noninteractive
-ENV TZ "Europe/Copenhagen"
-ENV CUPSADMIN admin
-ENV CUPSPASSWORD password
+ENV = DEBIAN_FRONTEND noninteractive
+ENV = TZ "Europe/Copenhagen"
+ENV = CUPSADMIN admin
+ENV = CUPSPASSWORD password
 
 
 LABEL org.opencontainers.image.description="CUPS Printer Server"
