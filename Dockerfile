@@ -81,6 +81,7 @@ EXPOSE 5353/udp
 # We want a mount for these
 VOLUME /config
 VOLUME /services
+VOLUME /PDF
 
 # Add scripts
 ADD root /
