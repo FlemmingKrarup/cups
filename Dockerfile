@@ -16,6 +16,7 @@ LABEL org.opencontainers.image.description="CUPS Printer Server"
 RUN apt-get update -qq && apt-get upgrade -qqy \
     && apt-get install -qqy \
     apt-utils \
+    tzdata \
     usbutils \
   #  cups \
   #  cups-filters \
@@ -99,7 +100,9 @@ RUN sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf && 
     sed -i 's/<Location \/admin\/conf>/<Location \/admin\/conf>\n  Allow All/' /etc/cups/cupsd.conf && \
     sed -i 's/.*enable\-dbus=.*/enable\-dbus\=no/' /etc/avahi/avahi-daemon.conf && \
     echo "ServerAlias *" >> /etc/cups/cupsd.conf && \
-    echo "DefaultEncryption Never" >> /etc/cups/cupsd.conf
+    echo "DefaultEncryption Never" >> /etc/cups/cupsd.conf && \
+    sed -i '/^#\?\s*\(Out\|AnonDirName\)\s/d' /etc/cups/cups-pdf.conf && \
+    printf 'Out /PDF\nAnonDirName /PDF\n' >> /etc/cups/cups-pdf.conf
 
 
 # back up cups configs in case used does not add their own

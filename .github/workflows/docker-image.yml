@@ -8,19 +8,24 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '00 3 1 * *'
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run:  |
-          docker login --username FlemmingKrarup --password ${{ secrets.GH_PAT}} ghcr.io
-          docker build . --tag ghcr.io/flemmingkrarup/cups:latest
-          docker push ghcr.io/flemmingkrarup/cups:latest
 
-      
-    #docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Build the Docker image
+      run: docker build . --tag ghcr.io/flemmingkrarup/cups:latest
+
+    # Only publish from trusted events - pull requests just verify that the image builds
+    - name: Log in to GHCR
+      if: github.event_name != 'pull_request'
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: echo "$GH_PAT" | docker login ghcr.io --username FlemmingKrarup --password-stdin
+
+    - name: Push the Docker image
+      if: github.event_name != 'pull_request'
+      run: docker push ghcr.io/flemmingkrarup/cups:latest

@@ -2,6 +2,14 @@
 set -e
 set -x
 
+# Apply TZ if provided and valid; otherwise keep the image default (UTC)
+if [ -n "$TZ" ] && [ -f "/usr/share/zoneinfo/$TZ" ]; then
+    ln -fs "/usr/share/zoneinfo/$TZ" /etc/localtime
+    echo "$TZ" > /etc/timezone
+elif [ -n "$TZ" ]; then
+    echo "WARNING: invalid TZ '$TZ', falling back to UTC"
+fi
+
 # Is CUPSADMIN set? If not, set to default
 if [ -z "$CUPSADMIN" ]; then
     CUPSADMIN="cupsadmin"
