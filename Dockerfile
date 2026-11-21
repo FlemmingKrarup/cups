@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/Copenhagen"
 ENV CUPSADMIN=admin
 ENV CUPSPASSWORD=password
-ENV CUPS_VERSION=2.4.16
+ENV CUPS_VERSION=2.4.20
 
 LABEL org.opencontainers.image.description="CUPS Printer Server"
 
